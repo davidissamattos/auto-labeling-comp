@@ -272,7 +272,7 @@ rank_df_table %>%
       linesep = "") %>% 
   kable_styling(latex_options = c("hold_position"),
                 full_width = F) %>% 
-  readr::write_lines('./paper/ranking10')
+  readr::write_lines('./paper/ranking10.tex')
 ```
 
 # Results for 50%
@@ -348,5 +348,5 @@ rank_df_table %>%
       linesep = "") %>% 
   kable_styling(latex_options = c("hold_position"),
                 full_width = F) %>% 
-  readr::write_lines('./paper/ranking50')
+  readr::write_lines('./paper/ranking50.tex')
 ```
