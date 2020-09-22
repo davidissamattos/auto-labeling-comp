@@ -1,0 +1,32 @@
+---
+title: "Automatic labeling comparisson - Online appendix"
+author: "Teodor Fredriksson, David Issa Mattos, Jan Bosch, Helena Holmström Olsson"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+site: bookdown::bookdown_site
+documentclass: book
+output:
+  bookdown::gitbook: default
+---
+
+
+# Preface {-}
+
+This is the analysis of the paper
+
+The environment was defined and based on the `renv` package. The `renv` package logs all the packages in the `renv.lock` file and manages installation for a specific project. For more information see documentation for renv
+To replicate this environment, after downloading this repository, type:
+
+```{r, eval=F, echo=T}
+renv::hydrate()
+```
+
+This command will download and install all the the packages use in this work. Note that it will install the packages only for this project. 
+
+## Compiling this document {-}
+
+This document was created with the `bookdown` package. To compile it (and run every command to generate the models, figures and etc. ) use the custom function from the utils.R file.
+
+```{r eval=F}
+compile_book()
+```
+

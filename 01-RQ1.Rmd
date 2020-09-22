@@ -1,0 +1,219 @@
+# RQ1
+
+How can we rank different active learning and semi-supervised learning algorithms in terms of accuracy?
+
+```{r}
+d <- read_csv('./data/auto-label-comparison.csv') %>%
+  dplyr::filter(ValueType=='Accuracy')
+```
+
+## Descriptive statistics
+```{r}
+p<-ggplot(data=d, aes(x=Model, y=Value, fill=Model))+
+  geom_boxplot()+
+  theme(axis.text.x = element_blank())+ #remove the x labels
+  labs(title = 'Accuracy (all datasets)')
+p
+save_fig(p,'aggregatedboxplots.pdf')
+```
+
+A respective table for this box-plot but with 5% and 95% quantiles
+
+```{r}
+d %>% 
+  dplyr::group_by(Model) %>% 
+  summarise(Mean = mean(Value),
+            SD = sd(Value),
+            Median = median(Value),
+            '5%' = quantile(Value,0.05),
+            '95%' = quantile(Value,0.95)) %>% 
+  dplyr::ungroup() %>% 
+  kable(
+        "latex", 
+        table.envir = 'table',
+        caption='Summary statistics for the accuracy aggregated data', 
+        booktabs=T,
+        label='summarystatisticstable',
+        format.args = list(scientific = FALSE), 
+        digits = 3,
+        linesep = "") %>% 
+    kable_styling(latex_options = c("hold_position"),
+                  full_width = F) %>% 
+    readr::write_lines('./paper/summarystatisticstable.tex')
+
+```
+
+
+Breaking down in all individual datasets if you want to justify the many outliers due to cifar
+
+```{r}
+p<-ggplot(data=d, aes(x=Model, y=Value, fill=Model))+
+  geom_boxplot()+
+  theme(axis.text.x = element_blank())+ #remove the x labels
+  facet_wrap(~Dataset)+
+  labs(title = 'Accuracy for individual dataset')
+p
+save_fig(p,'boxplotsperdataset.pdf')
+```
+
+
+## Bradley terry model for ranking
+
+To create a Bradley terry model we need first to transform our dataset to paired comparisons
+On each iteration for each dataset for each variable we will rank the models based on the Value of the accuracy (lower accuracy -> smaller)
+After we expand it to wide so we can compare each algorithm with each other and create a BT dataset
+```{r}
+d_acc_rank <- d %>% 
+  dplyr::group_by(Dataset, Variable, iterations) %>% 
+  dplyr::mutate(Rank=-rank(Value, ties.method = 'random')) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::select(-Value) %>% #we need to drop the Value variable to pivot wider
+  tidyr::pivot_wider(names_from = Model,
+                     values_from=Rank)
+```
+
+Now we can create the BT dataset
+
+```{r}
+#a vector with the name of the algorithms
+models <- get_index_names_as_array(d$Model)
+
+n_models = length(models)
+comb <- gtools::combinations(n=n_models, r=2, v=seq(1:n_models), repeats.allowed = F) #all teh paired combinations
+
+d_acc_bt <-  dplyr::tribble(~model0_name, ~model0, ~model1_name, ~model1, ~y, ~iterations, ~Dataset, ~DatasetType)
+
+#now we loop each row of the rank wide dataset and create a new one
+for(i in 1:nrow(d_acc_rank))
+{
+  current_row <- d_acc_rank[i,]
+  for(j in 1:nrow(comb)){
+    comb_row <- comb[j,]
+    
+    model0_name <- models[comb_row[1]]
+    model0 <- comb_row[1]
+    model0_rank <- current_row[[1,model0_name]]
+    
+    model1_name <- models[comb_row[2]]
+    model1 <- comb_row[2]
+    model1_rank <- current_row[[1,model1_name]]
+    
+    diff_rank <- model1_rank - model0_rank
+    #SInce higher accuracy is better if model 1 rank- model 0 rank is positive than model1 wins and y=1 else y=0
+    y <- ifelse(diff_rank>0, 1, 0) 
+    
+    
+    d_acc_bt <-d_acc_bt %>%  
+      add_row(model0_name=model0_name,
+              model0=model0,
+              model1_name=model1_name,
+              model1=model1,
+              y=y,
+              iterations=current_row$iterations,
+              Dataset=current_row$Dataset,
+              DatasetType=current_row$DatasetType)
+    
+  }
+}
+```
+
+Now that we have the dataset we can run the model
+
+```{r}
+print_stan_code('./models/rankingmodel.stan')
+```
+
+```{r}
+m1_data <- list(
+  N_total=nrow(d_acc_bt),
+  y = as.integer(d_acc_bt$y),
+  N_models = as.integer(n_models),
+  model0=as.integer(d_acc_bt$model0),
+  model1=as.integer(d_acc_bt$model1)
+  )
+```
+
+
+```{r echo=T, eval=F}
+m1_fit <- stan(file = './models/rankingmodel.stan',
+                     data=m1_data,
+                     chains = 4,
+                     warmup = 200,
+                     iter = 2000)
+saveRDS(m1_fit, file = "./data/m1_fit.RDS")
+```
+
+```{r}
+m1_fit <-readRDS("./data/m1_fit.RDS")
+a_model <- c("a_model[1]",
+           "a_model[2]",
+           "a_model[3]",
+           "a_model[4]",
+           "a_model[5]",
+           "a_model[6]",
+           "a_model[7]")
+rstan::traceplot(m1_fit, pars=a_model)
+```
+
+```{r}
+hpdi <- get_HPDI_from_stanfit(m1_fit)
+
+hpdi_algorithm <- hpdi %>% 
+      dplyr::filter(str_detect(Parameter, "a_model\\[")) %>%
+      dplyr::mutate(Parameter=models) 
+
+p<-ggplot(data=hpdi_algorithm, aes(x=Parameter))+
+  geom_pointrange(aes(
+    ymin=HPDI.lower, 
+    ymax=HPDI.higher, 
+    y=Mean))+
+  labs(y="Estimate", x="Model", title = "HPDI of the strength of the model")+
+  coord_flip()
+p
+save_fig(p,'strength-aggregated.pdf')
+```
+
+Here we are extracting all samples and ranking them to have a distribution of the ranks
+```{r}
+posterior <- rstan::extract(m1_fit)
+a_model <- as_tibble(posterior$a_model)
+colnames(a_model) <- models
+#sampling from the posterior
+s <- dplyr::sample_n(a_model, size = 1000, replace=T)
+s <- dplyr::mutate(s, rown = row_number())
+wide_s <- tidyr::pivot_longer(s, cols=all_of(models), names_to = "Models", values_to = "a_model")
+
+rank_df <- wide_s %>% 
+  dplyr::group_by(rown) %>% 
+  dplyr::mutate(Rank = rank(-a_model, ties.method = 'random')) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::select(-a_model) %>% 
+  dplyr::group_by(Models) %>% 
+  dplyr::summarise(MedianRank = median(Rank),
+                   VarianceRank = var(Rank)) %>% 
+  dplyr::arrange(MedianRank)
+```
+
+```{r}
+rank_df_table <- rank_df
+colnames(rank_df_table) <- c("Models","Median Rank", "Variance of the Rank")
+kable(rank_df_table, "html") %>% 
+  kable_styling(bootstrap_options = c('striped',"hover", "condensed" ))
+```
+saving the table to latex
+```{r}
+rank_df_table %>% 
+  kable(
+      "latex", 
+      table.envir = 'table',
+      caption='Ranking of the algorithms', 
+      booktabs=T,
+      label='rankingaggregated',
+      format.args = list(scientific = FALSE), 
+      digits = 3,
+      linesep = "") %>% 
+  kable_styling(latex_options = c("hold_position"),
+                full_width = F) %>% 
+  readr::write_lines('./paper/rankingaggregated.tex')
+```
+

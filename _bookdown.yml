@@ -1,0 +1,7 @@
+book_filename: "automatic-labelling"
+chapter_name: "Chapter "
+repo: -------
+delete_merged_file: true 
+output_dir: docs
+rmd_files: ["index.Rmd", "01-RQ1.Rmd","02-RQ2.Rmd"]
+new_session: no
