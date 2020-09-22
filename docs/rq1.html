@@ -141,9 +141,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="2" data-path="rq2.html"><a href="rq2.html"><i class="fa fa-check"></i><b>2</b> RQ2</a><ul>
 <li class="chapter" data-level="2.1" data-path="rq1.html"><a href="rq1.html#descriptive-statistics"><i class="fa fa-check"></i><b>2.1</b> Descriptive statistics</a></li>
 <li class="chapter" data-level="2.2" data-path="rq1.html"><a href="rq1.html#bradley-terry-model-for-ranking"><i class="fa fa-check"></i><b>2.2</b> Bradley terry model for ranking</a></li>
+<li class="chapter" data-level="2.3" data-path="rq2.html"><a href="rq2.html#results-for-10"><i class="fa fa-check"></i><b>2.3</b> Results for 10%</a></li>
+<li class="chapter" data-level="2.4" data-path="rq2.html"><a href="rq2.html#results-for-50"><i class="fa fa-check"></i><b>2.4</b> Results for 50%</a></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="results-for-10.html"><a href="results-for-10.html"><i class="fa fa-check"></i><b>3</b> Results for 10%</a></li>
-<li class="chapter" data-level="4" data-path="results-for-50.html"><a href="results-for-50.html"><i class="fa fa-check"></i><b>4</b> Results for 50%</a></li>
 </ul>
 
       </nav>
@@ -173,7 +173,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb4-3"><a href="rq1.html#cb4-3"></a><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_blank</span>())<span class="op">+</span><span class="st"> </span><span class="co">#remove the x labels</span></span>
 <span id="cb4-4"><a href="rq1.html#cb4-4"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;Accuracy (all datasets)&#39;</span>)</span>
 <span id="cb4-5"><a href="rq1.html#cb4-5"></a>p</span></code></pre></div>
-<p><img src="automatic-labelling_files/figure-html/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="automatic-labelling_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="rq1.html#cb5-1"></a><span class="kw">save_fig</span>(p,<span class="st">&#39;aggregatedboxplots.pdf&#39;</span>)</span></code></pre></div>
 <p>A respective table for this box-plot but with 5% and 95% quantiles</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="rq1.html#cb6-1"></a>d <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -203,7 +203,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb7-4"><a href="rq1.html#cb7-4"></a><span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span>Dataset)<span class="op">+</span></span>
 <span id="cb7-5"><a href="rq1.html#cb7-5"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;Accuracy for individual dataset&#39;</span>)</span>
 <span id="cb7-6"><a href="rq1.html#cb7-6"></a>p</span></code></pre></div>
-<p><img src="automatic-labelling_files/figure-html/unnamed-chunk-37-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="automatic-labelling_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="rq1.html#cb8-1"></a><span class="kw">save_fig</span>(p,<span class="st">&#39;boxplotsperdataset.pdf&#39;</span>)</span></code></pre></div>
 </div>
 <div id="bradley-terry-model-for-ranking" class="section level2">
@@ -336,7 +336,7 @@ model {
 <span id="cb15-7"><a href="rq1.html#cb15-7"></a>           <span class="st">&quot;a_model[6]&quot;</span>,</span>
 <span id="cb15-8"><a href="rq1.html#cb15-8"></a>           <span class="st">&quot;a_model[7]&quot;</span>)</span>
 <span id="cb15-9"><a href="rq1.html#cb15-9"></a>rstan<span class="op">::</span><span class="kw">traceplot</span>(m1_fit, <span class="dt">pars=</span>a_model)</span></code></pre></div>
-<p><img src="automatic-labelling_files/figure-html/unnamed-chunk-43-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="automatic-labelling_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="rq1.html#cb16-1"></a>hpdi &lt;-<span class="st"> </span><span class="kw">get_HPDI_from_stanfit</span>(m1_fit)</span>
 <span id="cb16-2"><a href="rq1.html#cb16-2"></a></span>
 <span id="cb16-3"><a href="rq1.html#cb16-3"></a>hpdi_algorithm &lt;-<span class="st"> </span>hpdi <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -351,7 +351,7 @@ model {
 <span id="cb16-12"><a href="rq1.html#cb16-12"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">y=</span><span class="st">&quot;Estimate&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Model&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;HPDI of the strength of the model&quot;</span>)<span class="op">+</span></span>
 <span id="cb16-13"><a href="rq1.html#cb16-13"></a><span class="st">  </span><span class="kw">coord_flip</span>()</span>
 <span id="cb16-14"><a href="rq1.html#cb16-14"></a>p</span></code></pre></div>
-<p><img src="automatic-labelling_files/figure-html/unnamed-chunk-44-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="automatic-labelling_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="rq1.html#cb17-1"></a><span class="kw">save_fig</span>(p,<span class="st">&#39;strength-aggregated.pdf&#39;</span>)</span></code></pre></div>
 <p>Here we are extracting all samples and ranking them to have a distribution of the ranks</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="rq1.html#cb18-1"></a>posterior &lt;-<span class="st"> </span>rstan<span class="op">::</span><span class="kw">extract</span>(m1_fit)</span>
@@ -398,7 +398,7 @@ LabelSpreadingKNN
 1
 </td>
 <td style="text-align:right;">
-0.3863824
+0.3766126
 </td>
 </tr>
 <tr>
@@ -409,7 +409,7 @@ UncertaintySampling
 2
 </td>
 <td style="text-align:right;">
-0.4143143
+0.4162152
 </td>
 </tr>
 <tr>
@@ -420,7 +420,7 @@ QBC
 3
 </td>
 <td style="text-align:right;">
-0.2198198
+0.2290040
 </td>
 </tr>
 <tr>
@@ -431,7 +431,7 @@ RandomSampling
 4
 </td>
 <td style="text-align:right;">
-0.0118679
+0.0059700
 </td>
 </tr>
 <tr>

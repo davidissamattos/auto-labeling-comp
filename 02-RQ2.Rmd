@@ -199,7 +199,7 @@ m50_fit <- stan(file = './models/rankingmodel.stan',
 saveRDS(m50_fit, file = "./data/m50_fit.RDS")
 ```
 
-# Results for 10%
+## Results for 10%
 
 ```{r}
 m10_fit <-readRDS("./data/m10_fit.RDS")
@@ -275,7 +275,7 @@ rank_df_table %>%
   readr::write_lines('./paper/ranking10.tex')
 ```
 
-# Results for 50%
+## Results for 50%
 
 ```{r}
 m50_fit <-readRDS("./data/m50_fit.RDS")
