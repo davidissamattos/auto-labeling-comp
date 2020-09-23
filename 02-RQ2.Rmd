@@ -225,7 +225,7 @@ p<-ggplot(data=hpdi_algorithm, aes(x=Parameter))+
     ymin=HPDI.lower, 
     ymax=HPDI.higher, 
     y=Mean))+
-  labs(y="Estimate", x="Model", title = "HPDI of the strength of the model with 10% missing labels")+
+  labs(y="Estimate", x="Model", title = "HPDI of the strength of the model with 10% of available labels")+
   coord_flip()
 p
 save_fig(p,'strength-10.pdf')
@@ -264,7 +264,7 @@ rank_df_table %>%
   kable(
       "latex", 
       table.envir = 'table',
-      caption='Ranking of the algorithms with 10% missing lables', 
+      caption='Ranking of the algorithms with 10% of available labels', 
       booktabs=T,
       label='ranking10',
       format.args = list(scientific = FALSE), 
@@ -301,7 +301,7 @@ p<-ggplot(data=hpdi_algorithm, aes(x=Parameter))+
     ymin=HPDI.lower, 
     ymax=HPDI.higher, 
     y=Mean))+
-  labs(y="Estimate", x="Model", title = "HPDI of the strength of the model with 50% missing labels")+
+  labs(y="Estimate", x="Model", title = "HPDI of the strength of the model with 50% of available labels")+
   coord_flip()
 p
 save_fig(p,'strength-50.pdf')
@@ -340,7 +340,7 @@ rank_df_table %>%
   kable(
       "latex", 
       table.envir = 'table',
-      caption='Ranking of the algorithms with 50% missing lables', 
+      caption='Ranking of the algorithms with 50% of available labels', 
       booktabs=T,
       label='ranking10',
       format.args = list(scientific = FALSE), 

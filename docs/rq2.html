@@ -349,7 +349,7 @@ After we expand it to wide so we can compare each algorithm with each other and 
 <span id="cb33-9"><a href="rq2.html#cb33-9"></a>    <span class="dt">ymin=</span>HPDI.lower, </span>
 <span id="cb33-10"><a href="rq2.html#cb33-10"></a>    <span class="dt">ymax=</span>HPDI.higher, </span>
 <span id="cb33-11"><a href="rq2.html#cb33-11"></a>    <span class="dt">y=</span>Mean))<span class="op">+</span></span>
-<span id="cb33-12"><a href="rq2.html#cb33-12"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">y=</span><span class="st">&quot;Estimate&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Model&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;HPDI of the strength of the model with 10% missing labels&quot;</span>)<span class="op">+</span></span>
+<span id="cb33-12"><a href="rq2.html#cb33-12"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">y=</span><span class="st">&quot;Estimate&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Model&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;HPDI of the strength of the model with 10% of available labels&quot;</span>)<span class="op">+</span></span>
 <span id="cb33-13"><a href="rq2.html#cb33-13"></a><span class="st">  </span><span class="kw">coord_flip</span>()</span>
 <span id="cb33-14"><a href="rq2.html#cb33-14"></a>p</span></code></pre></div>
 <p><img src="automatic-labelling_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -475,7 +475,7 @@ LabelPropagationKNN
 <span id="cb37-2"><a href="rq2.html#cb37-2"></a><span class="st">  </span><span class="kw">kable</span>(</span>
 <span id="cb37-3"><a href="rq2.html#cb37-3"></a>      <span class="st">&quot;latex&quot;</span>, </span>
 <span id="cb37-4"><a href="rq2.html#cb37-4"></a>      <span class="dt">table.envir =</span> <span class="st">&#39;table&#39;</span>,</span>
-<span id="cb37-5"><a href="rq2.html#cb37-5"></a>      <span class="dt">caption=</span><span class="st">&#39;Ranking of the algorithms with 10% missing lables&#39;</span>, </span>
+<span id="cb37-5"><a href="rq2.html#cb37-5"></a>      <span class="dt">caption=</span><span class="st">&#39;Ranking of the algorithms with 10% of available labels&#39;</span>, </span>
 <span id="cb37-6"><a href="rq2.html#cb37-6"></a>      <span class="dt">booktabs=</span>T,</span>
 <span id="cb37-7"><a href="rq2.html#cb37-7"></a>      <span class="dt">label=</span><span class="st">&#39;ranking10&#39;</span>,</span>
 <span id="cb37-8"><a href="rq2.html#cb37-8"></a>      <span class="dt">format.args =</span> <span class="kw">list</span>(<span class="dt">scientific =</span> <span class="ot">FALSE</span>), </span>
@@ -508,7 +508,7 @@ LabelPropagationKNN
 <span id="cb39-9"><a href="rq2.html#cb39-9"></a>    <span class="dt">ymin=</span>HPDI.lower, </span>
 <span id="cb39-10"><a href="rq2.html#cb39-10"></a>    <span class="dt">ymax=</span>HPDI.higher, </span>
 <span id="cb39-11"><a href="rq2.html#cb39-11"></a>    <span class="dt">y=</span>Mean))<span class="op">+</span></span>
-<span id="cb39-12"><a href="rq2.html#cb39-12"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">y=</span><span class="st">&quot;Estimate&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Model&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;HPDI of the strength of the model with 50% missing labels&quot;</span>)<span class="op">+</span></span>
+<span id="cb39-12"><a href="rq2.html#cb39-12"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">y=</span><span class="st">&quot;Estimate&quot;</span>, <span class="dt">x=</span><span class="st">&quot;Model&quot;</span>, <span class="dt">title =</span> <span class="st">&quot;HPDI of the strength of the model with 50% of available labels&quot;</span>)<span class="op">+</span></span>
 <span id="cb39-13"><a href="rq2.html#cb39-13"></a><span class="st">  </span><span class="kw">coord_flip</span>()</span>
 <span id="cb39-14"><a href="rq2.html#cb39-14"></a>p</span></code></pre></div>
 <p><img src="automatic-labelling_files/figure-html/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -634,7 +634,7 @@ LabelPropagationRBF
 <span id="cb43-2"><a href="rq2.html#cb43-2"></a><span class="st">  </span><span class="kw">kable</span>(</span>
 <span id="cb43-3"><a href="rq2.html#cb43-3"></a>      <span class="st">&quot;latex&quot;</span>, </span>
 <span id="cb43-4"><a href="rq2.html#cb43-4"></a>      <span class="dt">table.envir =</span> <span class="st">&#39;table&#39;</span>,</span>
-<span id="cb43-5"><a href="rq2.html#cb43-5"></a>      <span class="dt">caption=</span><span class="st">&#39;Ranking of the algorithms with 50% missing lables&#39;</span>, </span>
+<span id="cb43-5"><a href="rq2.html#cb43-5"></a>      <span class="dt">caption=</span><span class="st">&#39;Ranking of the algorithms with 50% of available labels&#39;</span>, </span>
 <span id="cb43-6"><a href="rq2.html#cb43-6"></a>      <span class="dt">booktabs=</span>T,</span>
 <span id="cb43-7"><a href="rq2.html#cb43-7"></a>      <span class="dt">label=</span><span class="st">&#39;ranking10&#39;</span>,</span>
 <span id="cb43-8"><a href="rq2.html#cb43-8"></a>      <span class="dt">format.args =</span> <span class="kw">list</span>(<span class="dt">scientific =</span> <span class="ot">FALSE</span>), </span>
