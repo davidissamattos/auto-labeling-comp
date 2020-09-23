@@ -41,8 +41,8 @@ d %>%
         format.args = list(scientific = FALSE), 
         digits = 3,
         linesep = "") %>% 
-  pack_rows("10% missing labels",1, n_models) %>%
-  pack_rows("50% missing labels",1+n_models,2*n_models) %>% 
+  pack_rows("10% labels available",1, n_models) %>%
+  pack_rows("50% labels available",1+n_models,2*n_models) %>% 
     kable_styling(latex_options = c("hold_position"),
                   full_width = F) %>% 
     readr::write_lines('./paper/summarystatisticstablemanualeffort.tex')
