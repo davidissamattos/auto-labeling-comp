@@ -1,0 +1,10 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+docs.zip
+_bookdown_files/*
+data/old/*
+paper/*
+automatic-labelling_cache/*
+automatic-labelling_files/*

@@ -4,7 +4,8 @@ How can we rank different active learning and semi-supervised learning algorithm
 
 ```{r}
 d <- read_csv('./data/auto-label-comparison.csv') %>%
-  dplyr::filter(ValueType=='Accuracy')
+  dplyr::rename(Value='value') %>% 
+  dplyr::filter(ValueType=='accuracy')
 ```
 
 ## Descriptive statistics
@@ -47,15 +48,39 @@ d %>%
 Breaking down in all individual datasets if you want to justify the many outliers due to cifar
 
 ```{r}
-p<-ggplot(data=d, aes(x=Model, y=Value, fill=Model))+
+p1<-
+  d %>% dplyr::filter(DataType=='numeric') %>% 
+  ggplot(aes(x=Model, y=Value, fill=Model))+
   geom_boxplot()+
   theme(axis.text.x = element_blank())+ #remove the x labels
   facet_wrap(~Dataset)+
-  labs(title = 'Accuracy for individual dataset')
-p
-save_fig(p,'boxplotsperdataset.pdf')
-```
+  labs(title = 'Numeric')
+  
+p2<-
+  d %>% dplyr::filter(DataType=='image') %>% 
+  ggplot(aes(x=Model, y=Value, fill=Model))+
+  geom_boxplot()+
+  theme(axis.text.x = element_blank())+ #remove the x labels
+  facet_wrap(~Dataset)+
+  labs(title = 'Image')
+  
+  
+p3<-
+  d %>% dplyr::filter(DataType=='text') %>% 
+  ggplot(aes(x=Model, y=Value, fill=Model))+
+  geom_boxplot()+
+  theme(axis.text.x = element_blank())+ #remove the x labels
+  facet_wrap(~Dataset)+
+  labs(title = 'Image')
 
+p1
+p2
+p3
+
+save_fig(p1,'boxplotsperdataset-numeric.pdf')
+save_fig(p2,'boxplotsperdataset-image.pdf')
+save_fig(p3,'boxplotsperdataset-text.pdf')
+```
 
 ## Bradley terry model for ranking
 
@@ -64,7 +89,7 @@ On each iteration for each dataset for each variable we will rank the models bas
 After we expand it to wide so we can compare each algorithm with each other and create a BT dataset
 ```{r}
 d_acc_rank <- d %>% 
-  dplyr::group_by(Dataset, Variable, iterations) %>% 
+  dplyr::group_by(Dataset, Variable, Iteration) %>% 
   dplyr::mutate(Rank=-rank(Value, ties.method = 'random')) %>% 
   dplyr::ungroup() %>% 
   dplyr::select(-Value) %>% #we need to drop the Value variable to pivot wider
@@ -81,7 +106,7 @@ models <- get_index_names_as_array(d$Model)
 n_models = length(models)
 comb <- gtools::combinations(n=n_models, r=2, v=seq(1:n_models), repeats.allowed = F) #all teh paired combinations
 
-d_acc_bt <-  dplyr::tribble(~model0_name, ~model0, ~model1_name, ~model1, ~y, ~iterations, ~Dataset, ~DatasetType)
+d_acc_bt <-  dplyr::tribble(~model0_name, ~model0, ~model1_name, ~model1, ~y, ~Iteration, ~Dataset, ~DatasetType)
 
 #now we loop each row of the rank wide dataset and create a new one
 for(i in 1:nrow(d_acc_rank))
@@ -109,9 +134,9 @@ for(i in 1:nrow(d_acc_rank))
               model1_name=model1_name,
               model1=model1,
               y=y,
-              iterations=current_row$iterations,
+              Iteration=current_row$Iteration,
               Dataset=current_row$Dataset,
-              DatasetType=current_row$DatasetType)
+              DatasetType=current_row$DataType)
     
   }
 }

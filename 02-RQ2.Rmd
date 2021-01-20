@@ -4,7 +4,8 @@ How do the rank of these algorithms change with changes in the amount of manual 
 
 ```{r}
 d <- read_csv('./data/auto-label-comparison.csv') %>%
-  dplyr::filter(ValueType=='Accuracy')
+  dplyr::rename(Value='value') %>% 
+  dplyr::filter(ValueType=='accuracy')
 d10 <- dplyr::filter(d,Variable=='10%')
 d50 <- dplyr::filter(d,Variable=='50%')
 ```
@@ -57,7 +58,7 @@ On each iteration for each dataset for each variable we will rank the models bas
 After we expand it to wide so we can compare each algorithm with each other and create a BT dataset
 ```{r}
 d_acc_rank_10 <- d10 %>% 
-  dplyr::group_by(Dataset, Variable, iterations) %>% 
+  dplyr::group_by(Dataset, Variable, Iteration) %>% 
   dplyr::mutate(Rank=-rank(Value, ties.method = 'random')) %>% 
   dplyr::ungroup() %>% 
   dplyr::select(-Value) %>% #we need to drop the Value variable to pivot wider
@@ -65,7 +66,7 @@ d_acc_rank_10 <- d10 %>%
                      values_from=Rank)
 
 d_acc_rank_50 <- d50 %>% 
-  dplyr::group_by(Dataset, Variable, iterations) %>% 
+  dplyr::group_by(Dataset, Variable, Iteration) %>% 
   dplyr::mutate(Rank=-rank(Value, ties.method = 'random')) %>% 
   dplyr::ungroup() %>% 
   dplyr::select(-Value) %>% #we need to drop the Value variable to pivot wider
@@ -82,9 +83,9 @@ models <- get_index_names_as_array(d$Model)
 n_models = length(models)
 comb <- gtools::combinations(n=n_models, r=2, v=seq(1:n_models), repeats.allowed = F) #all teh paired combinations
 
-d_acc_bt_10 <-  dplyr::tribble(~model0_name, ~model0, ~model1_name, ~model1, ~y, ~iterations, ~Dataset, ~DatasetType)
+d_acc_bt_10 <-  dplyr::tribble(~model0_name, ~model0, ~model1_name, ~model1, ~y, ~Iteration, ~Dataset, ~DataType)
 
-d_acc_bt_50 <-  dplyr::tribble(~model0_name, ~model0, ~model1_name, ~model1, ~y, ~iterations, ~Dataset, ~DatasetType)
+d_acc_bt_50 <-  dplyr::tribble(~model0_name, ~model0, ~model1_name, ~model1, ~y, ~Iteration, ~Dataset, ~DataType)
 ```
 
 ```{r}
@@ -114,9 +115,9 @@ for(i in 1:nrow(d_acc_rank_10))
               model1_name=model1_name,
               model1=model1,
               y=y,
-              iterations=current_row$iterations,
+              Iteration=current_row$Iteration,
               Dataset=current_row$Dataset,
-              DatasetType=current_row$DatasetType)
+              DataType=current_row$DataType)
     
   }
 }
@@ -150,9 +151,9 @@ for(i in 1:nrow(d_acc_rank_50))
               model1_name=model1_name,
               model1=model1,
               y=y,
-              iterations=current_row$iterations,
+              Iteration=current_row$Iteration,
               Dataset=current_row$Dataset,
-              DatasetType=current_row$DatasetType)
+              DataType=current_row$DataType)
     
   }
 }
