@@ -1,6 +1,8 @@
 rq1
 descriptive-statistics
 bradley-terry-model-for-ranking
+diagnostics
+results
 rq2
 descriptive-statistics-1
 bradley-terry-model-for-ranking-1

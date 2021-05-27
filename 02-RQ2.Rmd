@@ -3,9 +3,10 @@
 How do the rank of these algorithms change with changes in the amount of manual label effort prior to applying these methods?
 
 ```{r}
-d <- read_csv('./data/auto-label-comparison.csv') %>%
+d <- read_csv('./data/full_data.csv') %>%
   dplyr::rename(Value='value') %>% 
-  dplyr::filter(ValueType=='accuracy')
+  select(-X1)
+
 d10 <- dplyr::filter(d,Variable=='10%')
 d50 <- dplyr::filter(d,Variable=='50%')
 ```
@@ -185,19 +186,29 @@ m50_data <- list(
 we use the same model but with different data
 
 ```{r echo=T, eval=F}
-m10_fit <- stan(file = './models/rankingmodel.stan',
-                     data=m10_data,
-                     chains = 4,
-                     warmup = 200,
-                     iter = 2000)
-saveRDS(m10_fit, file = "./data/m10_fit.RDS")
 
-m50_fit <- stan(file = './models/rankingmodel.stan',
-                     data=m50_data,
-                     chains = 4,
-                     warmup = 200,
-                     iter = 2000)
-saveRDS(m50_fit, file = "./data/m50_fit.RDS")
+model <- cmdstanr::cmdstan_model(stan_file = './models/rankingmodel.stan')
+
+m10_fit <- model$sample(
+      data = m10_data,
+      chains = 4,
+      iter = 2000,
+      iter_warmup = 200,
+      parallel_chains = 4,
+      seed = 3103,
+    )
+
+m50_fit <- model$sample(
+      data = m50_data,
+      chains = 4,
+      iter = 2000,
+      iter_warmup = 200,
+      parallel_chains = 4,
+      seed = 3103,
+    )
+  
+m10_fit$save_object(file = "./data/m10_fit.RDS")
+m50_fit$save_object(file = "./data/m50_fit.RDS")
 ```
 
 ## Results for 10%
@@ -211,34 +222,34 @@ a_model <- c("a_model[1]",
            "a_model[5]",
            "a_model[6]",
            "a_model[7]")
-rstan::traceplot(m10_fit, pars=a_model)
+draws_a10 <- posterior::as_draws(m10_fit$draws(variables = a_model))
+
 ```
 
+Basic diagnostics
 ```{r}
-hpdi <- get_HPDI_from_stanfit(m10_fit)
+bayesplot::mcmc_trace(draws_a10, pars=a_model)
+m10_fit$cmdstan_diagnose()
+```
 
-hpdi_algorithm <- hpdi %>% 
-      dplyr::filter(str_detect(Parameter, "a_model\\[")) %>%
-      dplyr::mutate(Parameter=models) 
 
-p<-ggplot(data=hpdi_algorithm, aes(x=Parameter))+
-  geom_pointrange(aes(
-    ymin=HPDI.lower, 
-    ymax=HPDI.higher, 
-    y=Mean))+
-  labs(y="Estimate", x="Model", title = "HPDI of the strength of the model with 10% of available labels")+
-  coord_flip()
+
+```{r}
+p<-mcmc_intervals(draws_a10) +
+  scale_y_discrete(labels=models)+
+  labs(x='Estimate',
+       y='Model',
+       title='Strength parameters - Condition: 10%)')
 p
 save_fig(p,'strength-10.pdf')
 ```
 
 Here we are extracting all samples and ranking them to have a distribution of the ranks
 ```{r}
-posterior <- rstan::extract(m10_fit)
-a_model <- as_tibble(posterior$a_model)
-colnames(a_model) <- models
+posterior_df <- as.data.frame(posterior::as_draws_df(m10_fit$draws(variables = a_model)))[,1:n_models]
+colnames(posterior_df) <- models
 #sampling from the posterior
-s <- dplyr::sample_n(a_model, size = 1000, replace=T)
+s <- dplyr::sample_n(posterior_df, size = 1000, replace=T)
 s <- dplyr::mutate(s, rown = row_number())
 wide_s <- tidyr::pivot_longer(s, cols=all_of(models), names_to = "Models", values_to = "a_model")
 
@@ -259,7 +270,8 @@ colnames(rank_df_table) <- c("Models","Median Rank", "Variance of the Rank")
 kable(rank_df_table, "html") %>% 
   kable_styling(bootstrap_options = c('striped',"hover", "condensed" ))
 ```
-saving the table to latex
+
+Saving the table to latex
 ```{r}
 rank_df_table %>% 
   kable(
@@ -287,34 +299,32 @@ a_model <- c("a_model[1]",
            "a_model[5]",
            "a_model[6]",
            "a_model[7]")
-rstan::traceplot(m50_fit, pars=a_model)
+draws_a50 <- posterior::as_draws(m50_fit$draws(variables = a_model))
 ```
 
+Basic diagnostics
 ```{r}
-hpdi <- get_HPDI_from_stanfit(m50_fit)
+bayesplot::mcmc_trace(draws_a50, pars=a_model)
+m50_fit$cmdstan_diagnose()
+```
 
-hpdi_algorithm <- hpdi %>% 
-      dplyr::filter(str_detect(Parameter, "a_model\\[")) %>%
-      dplyr::mutate(Parameter=models) 
 
-p<-ggplot(data=hpdi_algorithm, aes(x=Parameter))+
-  geom_pointrange(aes(
-    ymin=HPDI.lower, 
-    ymax=HPDI.higher, 
-    y=Mean))+
-  labs(y="Estimate", x="Model", title = "HPDI of the strength of the model with 50% of available labels")+
-  coord_flip()
+```{r}
+p<-mcmc_intervals(draws_a50) +
+  scale_y_discrete(labels=models)+
+  labs(x='Estimate',
+       y='Model',
+       title='Strength parameters - Condition: 50%)')
 p
 save_fig(p,'strength-50.pdf')
 ```
 
 Here we are extracting all samples and ranking them to have a distribution of the ranks
 ```{r}
-posterior <- rstan::extract(m50_fit)
-a_model <- as_tibble(posterior$a_model)
-colnames(a_model) <- models
+posterior_df <- as.data.frame(posterior::as_draws_df(m50_fit$draws(variables = a_model)))[,1:n_models]
+colnames(posterior_df) <- models
 #sampling from the posterior
-s <- dplyr::sample_n(a_model, size = 1000, replace=T)
+s <- dplyr::sample_n(posterior_df, size = 1000, replace=T)
 s <- dplyr::mutate(s, rown = row_number())
 wide_s <- tidyr::pivot_longer(s, cols=all_of(models), names_to = "Models", values_to = "a_model")
 

@@ -21,3 +21,6 @@ viridis
 ggthemr
 progress
 gtools
+cmdstanr
+posterior
+bayesplot

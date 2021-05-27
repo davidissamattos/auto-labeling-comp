@@ -21,18 +21,6 @@ print_stan_code <- function(filename)
 }
 
 
-get_HPDI_from_stanfit<- function(stanfit)
-{
-  require(coda)
-  hpdi<-coda::HPDinterval(coda::as.mcmc(as.data.frame(stanfit)))
-  estimate<-as.data.frame(summary(stanfit)$summary)$mean
-  df<-tibble::rownames_to_column(as.data.frame(hpdi), "Parameter")
-  df.hpdi<-mutate(df,
-                  Mean=as.data.frame(summary(stanfit)$summary)$mean) %>%
-    rename(HPDI.lower=lower, HPDI.higher=upper)
-  return(df.hpdi)
-}
-
 save_fig <- function(p, name){
   path <- glue::glue('./paper/',name)
   ggsave(filename = path,

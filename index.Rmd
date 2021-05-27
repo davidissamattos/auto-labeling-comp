@@ -11,6 +11,45 @@ output:
 
 # Preface {-}
 
+Packages used for the analysis
+```{r message=F, warning=F}
+library(knitr)
+library(rmdformats)
+library(kableExtra)
+# #data processing
+library(tidyverse)
+library(glue)
+# #modeling
+library(cmdstanr)
+library(posterior)
+library(bayesplot)
+# #plotting
+library(patchwork)
+library(viridis)
+library(ggthemr)#devtools::install_github('cttobin/ggthemr')
+ggthemr('flat')
+
+library(progress)
+library(gtools)
+#sourcing local files
+source("utils.R")
+
+knitr::opts_chunk$set(
+  echo=T, 
+  warning=FALSE, 
+  include=T,
+  cache=T,
+  prompt=FALSE,
+  tidy=FALSE,
+  comment=NA,
+  message=FALSE,
+  fig.align='center')
+knitr::opts_knit$set(width=75)
+
+source("utils.R")
+```
+
+
 This document was created with the `bookdown` package. To compile it (and run every command to generate the models, figures and etc. ) use the custom function from the utils.R file.
 
 ```{r eval=F}

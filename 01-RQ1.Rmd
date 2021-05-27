@@ -3,9 +3,11 @@
 How can we rank different active learning and semi-supervised learning algorithms in terms of accuracy?
 
 ```{r}
-d <- read_csv('./data/auto-label-comparison.csv') %>%
-  dplyr::rename(Value='value') %>% 
-  dplyr::filter(ValueType=='accuracy')
+d <- read_csv('./data/full_data.csv') %>%
+  dplyr::rename(Value='value')  %>% 
+  select(-X1)
+# %>% 
+  # dplyr::filter(ValueType=='accuracy')
 ```
 
 ## Descriptive statistics
@@ -71,7 +73,7 @@ p3<-
   geom_boxplot()+
   theme(axis.text.x = element_blank())+ #remove the x labels
   facet_wrap(~Dataset)+
-  labs(title = 'Image')
+  labs(title = 'Text')
 
 p1
 p2
@@ -160,13 +162,21 @@ m1_data <- list(
 
 
 ```{r echo=T, eval=F}
-m1_fit <- stan(file = './models/rankingmodel.stan',
-                     data=m1_data,
-                     chains = 4,
-                     warmup = 200,
-                     iter = 2000)
-saveRDS(m1_fit, file = "./data/m1_fit.RDS")
+model <- cmdstanr::cmdstan_model(stan_file = './models/rankingmodel.stan')
+
+m1_fit <- model$sample(
+      data = m1_data,
+      chains = 4,
+      iter = 2000,
+      iter_warmup = 200,
+      parallel_chains = 4,
+      seed = 3103,
+    )
+  
+m1_fit$save_object(file = "./data/m1_fit.RDS")
 ```
+
+## Diagnostics
 
 ```{r}
 m1_fit <-readRDS("./data/m1_fit.RDS")
@@ -177,34 +187,28 @@ a_model <- c("a_model[1]",
            "a_model[5]",
            "a_model[6]",
            "a_model[7]")
-rstan::traceplot(m1_fit, pars=a_model)
+draws_a <- posterior::as_draws(m1_fit$draws(variables = a_model))
+bayesplot::mcmc_trace(draws_a, pars=a_model)
 ```
 
+## Results
+
 ```{r}
-hpdi <- get_HPDI_from_stanfit(m1_fit)
-
-hpdi_algorithm <- hpdi %>% 
-      dplyr::filter(str_detect(Parameter, "a_model\\[")) %>%
-      dplyr::mutate(Parameter=models) 
-
-p<-ggplot(data=hpdi_algorithm, aes(x=Parameter))+
-  geom_pointrange(aes(
-    ymin=HPDI.lower, 
-    ymax=HPDI.higher, 
-    y=Mean))+
-  labs(y="Estimate", x="Model", title = "HPDI of the strength of the model")+
-  coord_flip()
+p<-mcmc_intervals(draws_a) +
+  scale_y_discrete(labels=models)+
+  labs(x='Estimate',
+       y='Model',
+       title='Strength parameters')
 p
 save_fig(p,'strength-aggregated.pdf')
 ```
 
 Here we are extracting all samples and ranking them to have a distribution of the ranks
 ```{r}
-posterior <- rstan::extract(m1_fit)
-a_model <- as_tibble(posterior$a_model)
-colnames(a_model) <- models
+posterior_df <- as.data.frame(posterior::as_draws_df(m1_fit$draws(variables = a_model)))[,1:n_models]
+colnames(posterior_df) <- models
 #sampling from the posterior
-s <- dplyr::sample_n(a_model, size = 1000, replace=T)
+s <- dplyr::sample_n(posterior_df, size = 1000, replace=T)
 s <- dplyr::mutate(s, rown = row_number())
 wide_s <- tidyr::pivot_longer(s, cols=all_of(models), names_to = "Models", values_to = "a_model")
 
