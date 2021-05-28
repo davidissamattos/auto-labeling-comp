@@ -239,7 +239,7 @@ p<-mcmc_intervals(draws_a10) +
   scale_y_discrete(labels=models)+
   labs(x='Estimate',
        y='Model',
-       title='Strength parameters - Condition: 10%)')
+       title='Strength parameters - Condition: 10%')
 p
 save_fig(p,'strength-10.pdf')
 ```
@@ -314,7 +314,7 @@ p<-mcmc_intervals(draws_a50) +
   scale_y_discrete(labels=models)+
   labs(x='Estimate',
        y='Model',
-       title='Strength parameters - Condition: 50%)')
+       title='Strength parameters - Condition: 50%')
 p
 save_fig(p,'strength-50.pdf')
 ```
